@@ -95,11 +95,20 @@ export default function Home(){
     const r=await fetch("/api/packages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({country:d.name,origin,city,date,nights:nightsNumber,guests:guestsNumber,budget:budgetNumber})});
     const payload=await r.json();
     if(!r.ok) throw new Error(payload.error||"Не удалось выполнить поиск пакетных туров.");
-    setResults((payload.result||[]).map((x:any)=>({
-      id:String(x.tourIdentity||x.hotelId),title:x.hotelName||("Тур в "+(x.destinationName||city)),price:Number(x.price||0),
-      meta:(x.destinationName||city)+" · "+String(x.nights||nightsNumber)+" ночей · "+guestsNumber+" чел. · "+(x.hotelCategoryName||""),
-      badge:"Реальный тур",source:"Travelata",rating:x.hotelRating?Number(x.hotelRating):undefined,url:x.tourPageUrl||x.searchPageUrl
-    })).filter((x:Result)=>x.price>0&&x.price<=budgetNumber));
+    const packageRows=(payload.result||[])
+      .filter((x:any)=>String(x.destinationName||"").trim()===city.trim())
+      .map((x:any)=>({
+        id:String(x.tourIdentity||x.hotelId),
+        title:x.hotelName||("Тур в "+city),
+        price:Number(x.price||0),
+        meta:city+" · "+String(x.nights||nightsNumber)+" ночей · "+guestsNumber+" чел. · "+(x.hotelCategoryName||""),
+        badge:"Реальный тур",
+        source:"Travelata",
+        rating:x.hotelRating?Number(x.hotelRating):undefined,
+        url:x.tourPageUrl||x.searchPageUrl
+      }))
+      .filter((x:Result)=>x.price>0&&x.price<=budgetNumber);
+    setResults(packageRows);
   };
 
   const runSearch=async()=>{
