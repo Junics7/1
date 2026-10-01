@@ -96,8 +96,8 @@ export default function Home(){
     const payload=await r.json();
     if(!r.ok) throw new Error(payload.error||"Не удалось выполнить поиск пакетных туров.");
     setResults((payload.result||[]).map((x:any)=>({
-      id:String(x.tourIdentity||x.hotelId),title:x.hotelName||"Пакетный тур",price:Number(x.price||0),
-      meta:String(x.nights||nightsNumber)+" ночей · "+guestsNumber+" чел. · "+(x.hotelCategoryName||""),
+      id:String(x.tourIdentity||x.hotelId),title:x.hotelName||("Тур в "+(x.destinationName||city)),price:Number(x.price||0),
+      meta:(x.destinationName||city)+" · "+String(x.nights||nightsNumber)+" ночей · "+guestsNumber+" чел. · "+(x.hotelCategoryName||""),
       badge:"Реальный тур",source:"Travelata",rating:x.hotelRating?Number(x.hotelRating):undefined,url:x.tourPageUrl||x.searchPageUrl
     })).filter((x:Result)=>x.price>0&&x.price<=budgetNumber));
   };
